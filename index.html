@@ -139,12 +139,14 @@
     </p>
   </div>
 
-  <div class="section" id="closing">
-  <p style="text-align: center; font-size: 1.4rem; line-height: 1.8; color: #ffffff; font-weight: 400;">
-    세상의 점들을 연결하기 위해.<br>
-    <strong>KOSMORSE</strong>
-  </p>
-</div>
+<div id="overlay" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+" onclick="closePopup()"></div>
 
   <div style="display: flex; justify-content: center; align-items: center; margin: 80px 0 40px 0;">
   <div style="text-align: center; font-size: 1.1rem; color: #cccccc; line-height: 1.6;">
@@ -153,74 +155,84 @@
   </div>
 </div>
 
-  <script>
-    const canvas = document.getElementById('starCanvas');
-    const ctx = canvas.getContext('2d');
-    let stars = [];
+<script>
+  const canvas = document.getElementById('starCanvas');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
 
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 
-    for (let i = 0; i < 150; i++) {
-      stars.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 1.5 + 0.5
-      });
-    }
+  for (let i = 0; i < 150; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.5,
+      opacity: Math.random(), // 시작 투명도
+      opacitySpeed: (Math.random() * 0.02 + 0.005) * (Math.random() < 0.5 ? 1 : -1) // 반짝임 속도
+    });
+  }
 
-    function drawStars() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'white';
-      for (let star of stars) {
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-        ctx.fill();
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let star of stars) {
+      star.opacity += star.opacitySpeed;
+      if (star.opacity <= 0 || star.opacity >= 1) {
+        star.opacitySpeed *= -1;
+        star.opacity = Math.max(0, Math.min(1, star.opacity)); // 범위 제한
       }
 
-      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-      for (let i = 0; i < stars.length; i++) {
-        for (let j = i + 1; j < stars.length; j++) {
-          const dx = stars[i].x - stars[j].x;
-          const dy = stars[i].y - stars[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 100) {
-            ctx.beginPath();
-            ctx.moveTo(stars[i].x, stars[i].y);
-            ctx.lineTo(stars[j].x, stars[j].y);
-            ctx.stroke();
-          }
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+      ctx.fill();
+    }
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    for (let i = 0; i < stars.length; i++) {
+      for (let j = i + 1; j < stars.length; j++) {
+        const dx = stars[i].x - stars[j].x;
+        const dy = stars[i].y - stars[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 100) {
+          ctx.beginPath();
+          ctx.moveTo(stars[i].x, stars[i].y);
+          ctx.lineTo(stars[j].x, stars[j].y);
+          ctx.stroke();
         }
       }
-
-      requestAnimationFrame(drawStars);
     }
 
-    drawStars();
+    requestAnimationFrame(drawStars);
+  }
 
-    const sections = document.querySelectorAll('.section');
+  drawStars();
 
-    function revealSectionsOnScroll() {
-      sections.forEach(section => {
-        const top = section.getBoundingClientRect().top;
-        const bottom = section.getBoundingClientRect().bottom;
-        const trigger = window.innerHeight * 0.8;
+  const sections = document.querySelectorAll('.section');
 
-        if (top < trigger && bottom > 0) {
-          section.classList.add('visible');
-        } else {
-          section.classList.remove('visible');
-        }
-      });
-    }
+  function revealSectionsOnScroll() {
+    sections.forEach(section => {
+      const top = section.getBoundingClientRect().top;
+      const bottom = section.getBoundingClientRect().bottom;
+      const trigger = window.innerHeight * 0.8;
 
-    window.addEventListener('scroll', revealSectionsOnScroll);
-    revealSectionsOnScroll();
-  </script>
+      if (top < trigger && bottom > 0) {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', revealSectionsOnScroll);
+  revealSectionsOnScroll();
+</script>
+
 </body>
 </html>
