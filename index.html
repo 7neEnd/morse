@@ -163,6 +163,30 @@
 </div>
 
 <script>
+  // 코나미 커맨드 키 시퀀스
+  const konamiCode = [
+    "ArrowUp", "ArrowUp", 
+    "ArrowDown", "ArrowDown", 
+    "ArrowLeft", "ArrowRight", 
+    "ArrowLeft", "ArrowRight", 
+    "b", "a"
+  ];
+
+  let inputBuffer = [];
+
+  window.addEventListener("keydown", function (e) {
+    inputBuffer.push(e.key);
+    if (inputBuffer.length > konamiCode.length) {
+      inputBuffer.shift();
+    }
+
+    if (inputBuffer.join("") === konamiCode.join("")) {
+      window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+    }
+  });
+</script>
+
+<script>
   const canvas = document.getElementById('starCanvas');
   const ctx = canvas.getContext('2d');
   let stars = [];
